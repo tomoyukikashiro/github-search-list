@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'gatsby'
 
 import Layout from '../components/layout'
 import { searchQueryContext } from '../lib/search-query'
@@ -27,7 +26,6 @@ const EditPage = () => {
 
   return (
     <Layout>
-      <div><Link to="/">Home</Link></div>
       <searchQueryContext.Consumer>
         { context => (
           <div>
