@@ -1,4 +1,4 @@
-const pathPrefix = process.env.GH_PAGES === 'true' ? '/github-search-list' : ''
+const pathPrefix = process.env.GH_PAGES === 'true' ? '/github-search-list' : '/'
 
 module.exports = {
   siteMetadata: {
