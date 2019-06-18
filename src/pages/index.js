@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from "react"
+import { navigate } from 'gatsby'
 import * as clipboard from 'clipboard-polyfill'
 import Octokit from '@octokit/rest'
 
@@ -35,6 +36,7 @@ const IndexPage = () => {
   let octokit = null
 
   useEffect(() => {
+    if (!searchQuery.length) return navigate('/settings')
     fetch()
   }, [])
 
