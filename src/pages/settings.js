@@ -1,19 +1,27 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import Layout from '../components/layout'
-import { searchQueryContext } from '../lib/search-query'
+import { searchQueryContext, Query } from '../lib/search-query'
 import { saveData } from '../lib/storage'
 
 const EditPage = () => {
+  const [queryCount, setQueryCount] = useState(1)
+
   const onSubmit = (e, context) => {
     e.preventDefault()
 
-    const [nameElement, queryElement] = e.target
-    const newState = [...context.state, { id: Date.now(), name: nameElement.value, query: queryElement.value }]
+    const nameElement = e.target.elements.namedItem('name')
+    let queryElements = e.target.elements.namedItem('query')
+    queryElements = !!queryElements.length ? Array.from(queryElements) : [queryElements]
+    const name = nameElement.value
+    const queryString = queryElements.filter(e => !!e.value).map(e => e.value)
+
+    const newState = [...context.state, new Query({name, queryString})]
     context.setSate(newState)
-    saveData(newState)
+    saveData(newState.map(e => e.toHash()))
+
+    setQueryCount(1)
     nameElement.value = ''
-    queryElement.value = ''
   }
 
   const onRemove = (e, context, data) => {
@@ -23,6 +31,12 @@ const EditPage = () => {
     context.setSate(newState)
     saveData(newState)
   }
+
+  const addQueryString = e => {
+    e.preventDefault()
+    setQueryCount(queryCount + 1)
+  }
+
 
   return (
     <Layout>
@@ -35,14 +49,18 @@ const EditPage = () => {
                   <strong>Query Name</strong>
                 </div>
                 <div>
-                  <input type="text" name="name" placeholder="my pull requests" />
+                  <input type="text" name="name" required placeholder="my pull requests" />
                 </div>
 
                 <div>
-                  <strong>Query String</strong>
+                  <strong>Query String</strong><button onClick={addQueryString}>+</button>
                 </div>
                 <div>
-                  <textarea rows="3" name="query" placeholder="e.g. is:pr is:open" />
+                  { new Array(queryCount).fill().map(Math.random).map(v => (
+                    <div key={v}>
+                      <textarea rows="3" name="query" required placeholder="e.g. is:pr is:open" />
+                    </div>
+                  )) }
                 </div>
                 <button>save</button>
               </label>
@@ -51,7 +69,14 @@ const EditPage = () => {
               {!!context.state.length && (
                 <ul>
                   {context.state.map(data => (
-                    <li key={data.id}>{data.name} / {data.query} <button onClick={e => onRemove(e, context, data)}>x</button></li>
+                    <li key={data.id}>
+                      <div>{data.name}<button onClick={e => onRemove(e, context, data)}>x</button></div>
+                      <ul>
+                        { data.queryString.map((q, i) => (
+                          <li key={i}>{q}</li>
+                        )) }
+                      </ul>
+                    </li>
                   ))}
                 </ul>
               )}

@@ -1,14 +1,17 @@
+import { Query } from './search-query'
+
 const key = 'github-search-list'
 
 export const getData = () => {
   try {
-    return JSON.parse(localStorage.getItem(key) || [])
+    const raw = JSON.parse(localStorage.getItem(key) || [])
+    return raw.map(data => new Query(data))
   } catch {
     return []
   }
 }
 
-export const saveData = (data) => {
+export const saveData = (data = []) => {
   try {
     localStorage.setItem(key, JSON.stringify(data))
   } catch {

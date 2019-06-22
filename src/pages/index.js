@@ -30,13 +30,12 @@ const toMarkdown = (task) => {
 
 const IndexPage = () => {
   const { state: initialSearchQueries } = useContext(searchQueryContext)
-  const searchQuery = initialSearchQueries.map(q => ({ ...q }))
-  const [state, setState] = useState(searchQuery)
+  const [state, setState] = useState(initialSearchQueries)
   const [gt, setGa] = useState('')
   let octokit = null
 
   useEffect(() => {
-    if (!searchQuery.length) return navigate('/settings')
+    if (!state.length) return navigate('/settings')
     fetch()
   }, [])
 
@@ -54,8 +53,21 @@ const IndexPage = () => {
     if (e) e.preventDefault()
     if (!gt) return;
     const newState = await Promise.all(state.map(async data => {
-      const res = await getGithubClient(gt).search.issuesAndPullRequests({q: data.query})
-      return { ...data, result: res.data.items }
+      if (data.queryString.length === 1) {
+        const res = await getGithubClient(gt).search.issuesAndPullRequests({q: data.queryString[0]})
+        return { ...data, result: res.data.items }
+      } else {
+        const items = await Promise.all(data.queryString.map(async query => {
+          const res = await getGithubClient(gt).search.issuesAndPullRequests({q: query})
+          return res.data.items
+        }))
+        const uniqItems = items.reduce((result, items) => {
+          const newItem = items.filter(i => !result.find(j => j.id === i.id))
+          return [...result, ...newItem]
+        }, [])
+        return { ...data, result: uniqItems }
+      }
+
     }))
     setState(newState)
   }
