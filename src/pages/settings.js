@@ -51,8 +51,8 @@ const EditPage = () => {
               <span>Query String</span>
               <button type="button" className="btn btn-outline-secondary" onClick={addQueryString}>Add 'OR' query</button>
             </label>
-            { new Array(queryCount).fill().map(Math.random).map(v => (
-              <textarea className="form-control mb-3" key={v} rows="3" name="query" required placeholder="is:pr is:open" />
+            { new Array(queryCount).fill().map((v, i) => (
+              <textarea className="form-control mb-3" key={i} rows="3" name="query" required placeholder="is:pr is:open" />
             )) }
           </div>
           <button type="submit" className="btn btn-primary">Save</button>
