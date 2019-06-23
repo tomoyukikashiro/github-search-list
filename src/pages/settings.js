@@ -43,39 +43,38 @@ const EditPage = () => {
       <searchQueryContext.Consumer>
         { context => (
           <div>
-            <form onSubmit={e => onSubmit(e, context)}>
-              <label>
-                <div>
-                  <strong>Query Name</strong>
-                </div>
-                <div>
-                  <input type="text" name="name" required placeholder="my pull requests" />
-                </div>
-
-                <div>
-                  <strong>Query String</strong><button onClick={addQueryString}>+</button>
-                </div>
-                <div>
-                  { new Array(queryCount).fill().map(Math.random).map(v => (
-                    <div key={v}>
-                      <textarea rows="3" name="query" required placeholder="e.g. is:pr is:open" />
-                    </div>
-                  )) }
-                </div>
-                <button>save</button>
-              </label>
+            <form className="mb-5" onSubmit={e => onSubmit(e, context)}>
+              <div className="form-group mb-4">
+                <label htmlFor="name">Query Name</label>
+                <input className="form-control" type="text" name="name" id="name" required placeholder="my pull requests" />
+              </div>
+              <div className="form-group">
+                <label className="d-flex justify-content-between align-items-center">
+                  <span>Query String</span>
+                  <button type="button" className="btn btn-outline-secondary" onClick={addQueryString}>Add 'OR' query</button>
+                </label>
+                { new Array(queryCount).fill().map(Math.random).map(v => (
+                  <textarea className="form-control mb-3" key={v} rows="3" name="query" required placeholder="is:pr is:open" />
+                )) }
+              </div>
+              <button type="submit" className="btn btn-primary">Save</button>
             </form>
             <div>
               {!!context.state.length && (
-                <ul>
+                <ul className="pl-0">
                   {context.state.map(data => (
-                    <li key={data.id}>
-                      <div>{data.name}<button onClick={e => onRemove(e, context, data)}>x</button></div>
-                      <ul>
-                        { data.queryString.map((q, i) => (
-                          <li key={i}>{q}</li>
-                        )) }
-                      </ul>
+                    <li key={data.id} className="list-unstyled mb-4">
+                      <div className="card">
+                        <div className="card-header d-flex justify-content-between align-items-center">
+                          <span>{data.name}</span>
+                          <button type="button" className="btn btn-outline-secondary" onClick={e => onRemove(e, context, data)}>Delete</button>
+                        </div>
+                        <ul className="list-group list-group-flush">
+                          { data.queryString.map((q, i) => (
+                            <li key={i} className="list-group-item">{q}</li>
+                          )) }
+                        </ul>
+                      </div>
                     </li>
                   ))}
                 </ul>

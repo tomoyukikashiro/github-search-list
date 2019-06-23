@@ -9,17 +9,20 @@ import React from "react"
 import { Link } from 'gatsby'
 
 const Layout = ({ children }) => (
-  <>
-    <header>
-      <menu>
-        <ul>
-          <li><Link to='/'>HOME</Link></li>
-          <li><Link to='/settings'>Settings</Link></li>
-        </ul>
-      </menu>
+  <div className="container my-5">
+    <header className="mb-4 d-flex justify-content-between align-items-center">
+      <h1>Github Search List</h1>
+      <ul className="nav">
+        <li className="nav-item">
+          <Link className="nav-link" activeClassName="disabled" to='/'>HOME</Link>
+        </li>
+        <li className="nav-item">
+          <Link className="nav-link" activeClassName="disabled" to='/settings'>SETTINGS</Link>
+        </li>
+      </ul>
     </header>
     <main>{children}</main>
-  </>
+  </div>
 )
 
 export default Layout

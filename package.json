@@ -6,6 +6,7 @@
   "author": "Kyle Mathews <mathews.kyle@gmail.com>",
   "dependencies": {
     "@octokit/rest": "^16.28.1",
+    "bootstrap": "^4.3.1",
     "clipboard-polyfill": "^2.8.1",
     "gatsby": "^2.9.0",
     "gatsby-plugin-react-helmet": "^3.0.12",

@@ -10,11 +10,11 @@ const toHtml = (task) => {
   const repo = task.repository_url.split('/').pop()
   const title = `#${task.number} ${task.title}`
   return (
-    <li key={task.id}>
-      <a href={task.url} title={title}>{ title }</a> [{repo}]
+    <li key={task.id} className="list-group-item">
+      <span className="text-secondary mr-2">{repo}</span><a href={task.html_url} title={title} target="_blank" rel="noopener noreferrer">{ title }</a>
       <div>
         { task.labels.length && task.labels.map(label => (
-          <span key={label.id} style={ { color: '#fff', backgroundColor: `#${label.color}` } }>{ label.name }</span>
+          <span key={label.id} className="badge badge-light mr-1" style={ { color: '#fff', backgroundColor: `#${label.color}` } }>{ label.name }</span>
         )) }
       </div>
     </li>
@@ -24,7 +24,7 @@ const toHtml = (task) => {
 const toMarkdown = (task) => {
   const repo = task.repository_url.split('/').pop()
   const title = `#${task.number} ${task.title}`
-  return `[${title}](${task.url}) [${repo}]`
+  return `[${title}](${task.html_url}) [${repo}]`
 }
 
 
@@ -74,24 +74,32 @@ const IndexPage = () => {
 
   return (
     <Layout>
-      <div>
-        <form onSubmit={e => fetch(e)}>
-          <input type="password" name="gt" value={gt} onChange={e => setGa(e.currentTarget.value)}/>
-          <button>fetch issues</button>
+      <div className="mb-3">
+        <form className="form-inline" onSubmit={e => fetch(e)}>
+          <div className="form-group mr-2 w-25">
+            <input className="form-control w-100" type="password" name="gt" value={gt} onChange={e => setGa(e.currentTarget.value)}/>
+          </div>
+          <button className="btn btn-primary">fetch</button>
         </form>
       </div>
+
       { state.map(data => (
-        <div key={data.id}>
-          <h2>{data.name} <button onClick={() => onClickClipboard(data)}>copy as markdown</button></h2>
-          { data.hasOwnProperty('result')
-            ? !!data.result.length
-              ? <ul>
-                { data.result.map(task => (
-                  toHtml(task)
-                )) }
+        <div key={data.id} className="card mb-4">
+          <h5 className="card-header d-flex justify-content-between align-items-center">
+            <span>{data.name}</span>
+            <button className="btn btn-outline-dark" onClick={() => onClickClipboard(data)}>copy as markdown</button></h5>
+          <div className="card-body">
+            { data.hasOwnProperty('result')
+              ? !!data.result.length
+                ? <ul className="list-group list-group-flush">
+                  { data.result.map(task => (
+                    toHtml(task)
+                  )) }
                 </ul>
-              : <div>なし</div>
-            : <div>Loading...</div> }
+                : <div>なし</div>
+              : <div>Loading...</div> }
+
+          </div>
         </div>
       )) }
     </Layout>
