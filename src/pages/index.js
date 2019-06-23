@@ -30,18 +30,18 @@ const toMarkdown = (task) => {
 
 
 const IndexPage = () => {
-  const { state: initialSearchQueries } = useContext(searchQueryContext)
-  const { state: tokenState, setState: setTokenState } = useContext(tokenContext)
-  const [queryState, setQueryState] = useState(initialSearchQueries)
+  const { searchQueryState } = useContext(searchQueryContext)
+  const { tokenState, setTokenState } = useContext(tokenContext)
+  const [ results, setResults ] = useState(searchQueryState.map(q => ({id: q.id, name: q.name})))
   let octokit = null
 
   useEffect(() => {
-    if (!queryState.length) return navigate('/settings')
+    if (!searchQueryState.length) return navigate('/settings')
     fetch()
   }, [])
 
   const onClickClipboard = data => {
-    clipboard.writeText(data.result.map(task => (toMarkdown(task))).join('\n'))
+    clipboard.writeText(data.items.map(task => (toMarkdown(task))).join('\n'))
   }
 
   const getGithubClient = (gt) => {
@@ -53,10 +53,11 @@ const IndexPage = () => {
   const fetch = async e => {
     if (e) e.preventDefault()
     if (!tokenState) return;
-    const newQueryState = await Promise.all(queryState.map(async data => {
+
+    const newResults = await Promise.all(searchQueryState.map(async data => {
       if (data.queryString.length === 1) {
         const res = await getGithubClient(tokenState).search.issuesAndPullRequests({q: data.queryString[0]})
-        return { ...data, result: res.data.items }
+        return { id: data.id, name: data.name, items: res.data.items }
       } else {
         const items = await Promise.all(data.queryString.map(async query => {
           const res = await getGithubClient(tokenState).search.issuesAndPullRequests({q: query})
@@ -66,11 +67,11 @@ const IndexPage = () => {
           const newItem = items.filter(i => !result.find(j => j.id === i.id))
           return [...result, ...newItem]
         }, [])
-        return { ...data, result: uniqItems }
+        return { id: data.id, name: data.name, items: uniqItems }
       }
-
     }))
-    setQueryState(newQueryState)
+
+    setResults(newResults)
   }
 
   return (
@@ -84,16 +85,16 @@ const IndexPage = () => {
         </form>
       </div>
 
-      { queryState.map(data => (
+      { results.map(data => (
         <div key={data.id} className="card mb-4">
           <h5 className="card-header d-flex justify-content-between align-items-center">
             <span>{data.name}</span>
             <button className="btn btn-outline-dark" onClick={() => onClickClipboard(data)}>copy as markdown</button></h5>
           <div className="card-body">
-            { data.hasOwnProperty('result')
-              ? !!data.result.length
+            { data.hasOwnProperty('items')
+              ? !!data.items.length
                 ? <ul className="list-group list-group-flush">
-                  { data.result.map(task => (
+                  { data.items.map(task => (
                     toHtml(task)
                   )) }
                 </ul>

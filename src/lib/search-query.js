@@ -49,8 +49,8 @@ export const SearchQuery = ({ children }) => {
   return (
     <searchQueryContext.Provider
       value={{
-        state: searchQueryState,
-        setState: setSearchQueryState
+        searchQueryState,
+        setSearchQueryState
       }}>
       { children }
     </searchQueryContext.Provider>

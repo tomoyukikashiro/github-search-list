@@ -7,8 +7,8 @@ export const Token = ({ children }) => {
   return (
     <tokenContext.Provider
       value={{
-        state: tokenState,
-        setState: setTokenState
+        tokenState,
+        setTokenState
       }}>
       { children }
     </tokenContext.Provider>
