@@ -8,7 +8,10 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import React from 'react'
 import { SearchQuery } from './src/lib/search-query'
+import { Token } from './src/lib/token'
 
 export const wrapRootElement = ({ element }) => (
-    <SearchQuery>{element}</SearchQuery>
+    <Token>
+        <SearchQuery>{element}</SearchQuery>
+    </Token>
 )

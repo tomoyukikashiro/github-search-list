@@ -5,6 +5,7 @@ import Octokit from '@octokit/rest'
 
 import Layout from "../components/layout"
 import { searchQueryContext } from '../lib/search-query'
+import { tokenContext } from '../lib/token'
 
 const toHtml = (task) => {
   const repo = task.repository_url.split('/').pop()
@@ -30,12 +31,12 @@ const toMarkdown = (task) => {
 
 const IndexPage = () => {
   const { state: initialSearchQueries } = useContext(searchQueryContext)
-  const [state, setState] = useState(initialSearchQueries)
-  const [gt, setGa] = useState('')
+  const { state: tokenState, setState: setTokenState } = useContext(tokenContext)
+  const [queryState, setQueryState] = useState(initialSearchQueries)
   let octokit = null
 
   useEffect(() => {
-    if (!state.length) return navigate('/settings')
+    if (!queryState.length) return navigate('/settings')
     fetch()
   }, [])
 
@@ -51,14 +52,14 @@ const IndexPage = () => {
 
   const fetch = async e => {
     if (e) e.preventDefault()
-    if (!gt) return;
-    const newState = await Promise.all(state.map(async data => {
+    if (!tokenState) return;
+    const newQueryState = await Promise.all(queryState.map(async data => {
       if (data.queryString.length === 1) {
-        const res = await getGithubClient(gt).search.issuesAndPullRequests({q: data.queryString[0]})
+        const res = await getGithubClient(tokenState).search.issuesAndPullRequests({q: data.queryString[0]})
         return { ...data, result: res.data.items }
       } else {
         const items = await Promise.all(data.queryString.map(async query => {
-          const res = await getGithubClient(gt).search.issuesAndPullRequests({q: query})
+          const res = await getGithubClient(tokenState).search.issuesAndPullRequests({q: query})
           return res.data.items
         }))
         const uniqItems = items.reduce((result, items) => {
@@ -69,7 +70,7 @@ const IndexPage = () => {
       }
 
     }))
-    setState(newState)
+    setQueryState(newQueryState)
   }
 
   return (
@@ -77,13 +78,13 @@ const IndexPage = () => {
       <div className="mb-3">
         <form className="form-inline" onSubmit={e => fetch(e)}>
           <div className="form-group mr-2 w-25">
-            <input className="form-control w-100" type="password" name="gt" value={gt} onChange={e => setGa(e.currentTarget.value)}/>
+            <input className="form-control w-100" type="password" name="gt" value={tokenState} onChange={e => setTokenState(e.currentTarget.value)}/>
           </div>
           <button className="btn btn-primary">fetch</button>
         </form>
       </div>
 
-      { state.map(data => (
+      { queryState.map(data => (
         <div key={data.id} className="card mb-4">
           <h5 className="card-header d-flex justify-content-between align-items-center">
             <span>{data.name}</span>

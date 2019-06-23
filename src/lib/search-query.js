@@ -50,7 +50,7 @@ export const SearchQuery = ({ children }) => {
     <searchQueryContext.Provider
       value={{
         state: searchQueryState,
-        setSate: setSearchQueryState
+        setState: setSearchQueryState
       }}>
       { children }
     </searchQueryContext.Provider>
