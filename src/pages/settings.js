@@ -47,10 +47,13 @@ const EditPage = () => {
             <input className="form-control" type="text" name="name" id="name" required placeholder="my pull requests" />
           </div>
           <div className="form-group">
-            <label className="d-flex justify-content-between align-items-center">
-              <span>Query String</span>
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <label className="mb-0">Query String</label>
+                <span className="ml-3">(<a href="https://help.github.com/en/articles/about-searching-on-github" target="_blank" rel="noopener noreferrer">Github Query Help</a>)</span>
+              </div>
               <button type="button" className="btn btn-outline-secondary" onClick={addQueryString}>Add 'OR' query</button>
-            </label>
+            </div>
             { new Array(queryCount).fill().map((v, i) => (
               <textarea className="form-control mb-3" key={i} rows="3" name="query" required placeholder="is:pr is:open" />
             )) }
