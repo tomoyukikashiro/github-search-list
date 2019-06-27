@@ -81,7 +81,7 @@ const IndexPage = () => {
       <div className="mb-3">
         <form className="form-inline" onSubmit={fetch}>
           <div className="form-group mr-2 w-25">
-            <input className="form-control w-100" type="password" name="gt" defaultValue={tokenState}/>
+            <input className="form-control w-100" type="password" name="gt" placeholder="Github Token" defaultValue={tokenState}/>
           </div>
           <button className="btn btn-primary"> { fetched ? 'refetch' : 'fetch' }</button>
         </form>
