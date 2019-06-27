@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, Suspense } from "react"
+import React, {useEffect, useContext, Suspense, useState} from 'react'
 import { navigate } from 'gatsby'
 import * as clipboard from 'clipboard-polyfill'
 
@@ -51,6 +51,7 @@ const toMarkdown = (task) => {
 const IndexPage = () => {
   const { searchQueryState } = useContext(searchQueryContext)
   const { tokenState, setTokenState } = useContext(tokenContext)
+  const [fetched, setFetched] = useState(0)
 
   useEffect(() => {
     if (!searchQueryState.length) return navigate('/settings')
@@ -64,6 +65,14 @@ const IndexPage = () => {
 
   const fetch = e => {
     e.preventDefault()
+    if (fetched) {
+      // refetch
+      cachedResults.clear()
+      setFetched(count => count + 1)
+    } else {
+      // fetch
+      setFetched(count => count + 1)
+    }
     setTokenState(e.target.elements.namedItem('gt').value)
   }
 
@@ -74,7 +83,7 @@ const IndexPage = () => {
           <div className="form-group mr-2 w-25">
             <input className="form-control w-100" type="password" name="gt" defaultValue={tokenState}/>
           </div>
-          <button className="btn btn-primary">fetch</button>
+          <button className="btn btn-primary"> { fetched ? 'refetch' : 'fetch' }</button>
         </form>
       </div>
 
