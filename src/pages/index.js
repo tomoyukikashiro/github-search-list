@@ -45,7 +45,7 @@ const TaskListSuspense = ({ token, queries }) => {
 const toMarkdown = (task) => {
   const repo = task.repository_url.split('/').pop()
   const title = `#${task.number} ${task.title}`
-  return `[${title}](${task.html_url}) [${repo}]`
+  return `[${repo}] [${title}](${task.html_url})`
 }
 
 const IndexPage = () => {
