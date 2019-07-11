@@ -23,7 +23,7 @@ const TaskList = ({ tasks }) => {
           <span className="text-secondary mr-2">{repoName(task)}</span>
           <a href={task.html_url} title={title(task)} target="_blank" rel="noopener noreferrer">{ title(task) }</a>
           <div>
-            { task.labels.length && task.labels.map(label => (
+            { task.labels.map(label => (
               <span key={label.id} className="badge badge-light mr-1" style={ { color: '#fff', backgroundColor: `#${label.color}` } }>{ label.name }</span>
             )) }
           </div>
