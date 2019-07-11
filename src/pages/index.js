@@ -1,6 +1,7 @@
 import React, {useEffect, useContext, Suspense, useState} from 'react'
 import { navigate } from 'gatsby'
 import * as clipboard from 'clipboard-polyfill'
+import Octicon, {IssueClosed, IssueOpened, GitPullRequest} from '@primer/octicons-react'
 
 import Layout from "../components/layout"
 import { searchQueryContext } from '../lib/search-query'
@@ -24,13 +25,18 @@ const TaskList = ({ tasks }) => {
     <ul className="list-group list-group-flush">
       { tasks.map(task => (
         <li key={task.id} className="list-group-item px-0 d-flex flex-column flex-md-row justify-content-md-between">
-          <div className="flex-shrink-1">
-            <span className="text-secondary mr-2">{repoName(task)}</span>
-            <a href={task.html_url} title={title(task)} target="_blank" rel="noopener noreferrer">{ title(task) }</a>
+          <div className="flex-shrink-1 d-flex">
+            <div className="mr-3">
+              <TaskIcon task={task} />
+            </div>
             <div>
-              { task.labels.map(label => (
-                <span key={label.id} className="badge badge-light mr-1" style={ { color: '#fff', backgroundColor: `#${label.color}` } }>{ label.name }</span>
-              )) }
+              <span className="text-secondary mr-2">{repoName(task)}</span>
+              <a href={task.html_url} title={title(task)} target="_blank" rel="noopener noreferrer">{ title(task) }</a>
+              <div>
+                { task.labels.map(label => (
+                  <span key={label.id} className="badge badge-light mr-1" style={ { color: '#fff', backgroundColor: `#${label.color}` } }>{ label.name }</span>
+                )) }
+              </div>
             </div>
           </div>
           <div className="pl-md-3">
@@ -40,6 +46,16 @@ const TaskList = ({ tasks }) => {
       )) }
     </ul>
   )
+}
+
+const TaskIcon = ({ task }) => {
+  if (task.hasOwnProperty('pull_request')) {
+    return <Octicon verticalAlign='top' icon={GitPullRequest} />
+  } else if (task.state === 'close') {
+    return <Octicon verticalAlign='top' icon={IssueClosed} />
+  } else {
+    return <Octicon verticalAlign='top' icon={IssueOpened} />
+  }
 }
 
 const TaskListSuspense = ({ token, queries }) => {
