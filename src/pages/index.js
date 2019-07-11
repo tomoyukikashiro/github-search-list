@@ -11,6 +11,10 @@ const TaskList = ({ tasks }) => {
   const repoName = (task) => task.repository_url.split('/').pop()
   const title = (task) => `#${task.number} ${task.title}`
 
+  const onClickClipboard = task => {
+    clipboard.writeText(toMarkdown(task))
+  }
+
   if (!tasks.length) return (
     <ul className="list-group list-group-flush">
       <li className="list-group-item">なし</li>
@@ -19,13 +23,18 @@ const TaskList = ({ tasks }) => {
   return (
     <ul className="list-group list-group-flush">
       { tasks.map(task => (
-        <li key={task.id} className="list-group-item">
-          <span className="text-secondary mr-2">{repoName(task)}</span>
-          <a href={task.html_url} title={title(task)} target="_blank" rel="noopener noreferrer">{ title(task) }</a>
-          <div>
-            { task.labels.map(label => (
-              <span key={label.id} className="badge badge-light mr-1" style={ { color: '#fff', backgroundColor: `#${label.color}` } }>{ label.name }</span>
-            )) }
+        <li key={task.id} className="list-group-item px-0 d-flex flex-column flex-md-row justify-content-md-between">
+          <div className="flex-shrink-1">
+            <span className="text-secondary mr-2">{repoName(task)}</span>
+            <a href={task.html_url} title={title(task)} target="_blank" rel="noopener noreferrer">{ title(task) }</a>
+            <div>
+              { task.labels.map(label => (
+                <span key={label.id} className="badge badge-light mr-1" style={ { color: '#fff', backgroundColor: `#${label.color}` } }>{ label.name }</span>
+              )) }
+            </div>
+          </div>
+          <div className="pl-md-3">
+            <button className="btn btn-sm btn-outline-dark" onClick={() => onClickClipboard(task)}>copy as markdown</button>
           </div>
         </li>
       )) }
@@ -42,10 +51,16 @@ const TaskListSuspense = ({ token, queries }) => {
   throw getTasks(token, queries)
 }
 
-const toMarkdown = (task) => {
+const toMarkdown = task => {
   const repo = task.repository_url.split('/').pop()
   const title = `#${task.number} ${task.title}`
   return `[${repo}] [${title}](${task.html_url})`
+}
+
+const queryToMarkdown = queryString => {
+  const tasks = cachedResults.get(queryString)
+  if (!tasks) return
+  return tasks.map(task => (toMarkdown(task))).join('\n')
 }
 
 const IndexPage = () => {
@@ -58,9 +73,7 @@ const IndexPage = () => {
   }, [])
 
   const onClickClipboard = data => {
-    const tasks = cachedResults.get(data.queryString)
-    if (!tasks) return
-    clipboard.writeText(tasks.map(task => (toMarkdown(task))).join('\n'))
+    clipboard.writeText(queryToMarkdown(data.queryString))
   }
 
   const fetch = e => {
@@ -91,7 +104,8 @@ const IndexPage = () => {
         <div key={data.id} className="card mb-4">
           <h5 className="card-header d-flex justify-content-between align-items-center">
             <span>{data.name}</span>
-            <button className="btn btn-outline-dark" onClick={() => onClickClipboard(data)}>copy as markdown</button></h5>
+            <button className="btn btn-dark btn-sm" onClick={() => onClickClipboard(data)}>copy as markdown</button>
+          </h5>
           <div className="card-body">
             <Suspense fallback={<>Loading...</>}>
               <TaskListSuspense token={tokenState} queries={data.queryString}/>
