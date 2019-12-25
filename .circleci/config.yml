@@ -7,7 +7,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - npm-{{ checksum "package.json" }}
+            - npm-{{ checksum "yarn.lock" }}
       - run: yarn install
       - run: git config user.name $GITHUB_NAME
       - run: git config user.email $GITHUB_EMAIL
