@@ -133,6 +133,8 @@ const queryToMarkdown = queryString => {
 }
 
 const WorkSpace = ({ workSpaceId }) => {
+  const isSSR = typeof window === 'undefined'
+  if (isSSR) return null
   const classes = useStyles()
   const { workSpaceState } = useContext(workSpaceContext)
   const [queryForm, setQueryForm] = React.useState({ open: false, query: null});
