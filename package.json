@@ -40,7 +40,8 @@
     "start": "npm run develop",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
+    "build:gh-pages": "GH_PAGES=true gatsby build --prefix-paths",
+    "deploy:gh-pages": "gh-pages -d public -m 'chore: update [skip ci]' -t"
   },
   "repository": {
     "type": "git",
