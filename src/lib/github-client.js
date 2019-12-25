@@ -1,13 +1,13 @@
-import Octokit from '@octokit/rest'
+import GitHub from 'github-api';
 
-let octokit = null
+let gh = null;
 export const cachedResults = new Map()
 
 export const getTasks = async (token, queries) => {
-  octokit = octokit || new Octokit({ auth: token})
+  gh = gh || new GitHub({ token: token}).search()
   const items = await Promise.all(queries.map(query => {
-    return octokit.search.issuesAndPullRequests({q: query})
-      .then(res => res.data.items)
+    return gh.forIssues({q: query})
+      .then(res => res.data)
   }))
   const uniqItems = items.reduce((result, items) => {
     const newItem = items.filter(i => !result.find(j => j.id === i.id))
