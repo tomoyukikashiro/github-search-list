@@ -26,6 +26,14 @@ import Fab from '@material-ui/core/Fab'
 import AddIcon from '@material-ui/icons/Add'
 import {saveData} from '../lib/storage'
 import {tokenContext} from '../lib/token'
+const isSSR = typeof window === 'undefined'
+
+const relativeDateFormat = dateString => {
+  if (isSSR) return dateString;
+  const rtf = new Intl.RelativeTimeFormat('en', { style: 'narrow' })
+  const diff = Math.ceil((new Date(dateString) - new Date()) / (1000 * 60 * 60 * 24))
+  return rtf.format(diff, 'day')
+}
 
 const useStyles = makeStyles(() => ({
   workSpace: {
@@ -79,6 +87,13 @@ const TaskList = ({ tasks }) => {
         >
           {repoName(task)}
         </Typography>
+        <Typography
+          component="span"
+          variant="body2"
+          className={useStyles.repo}
+        >
+          {relativeDateFormat(task.updated_at)}
+        </Typography>
         {task.labels.map(label => (
           <Chip component="span"
                 size="small"
@@ -126,14 +141,7 @@ const toMarkdown = task => {
   return `[${repo}] [${title}](${task.html_url})`
 }
 
-const queryToMarkdown = queryString => {
-  const tasks = cachedResults.get(queryString)
-  if (!tasks) return
-  return tasks.map(task => (toMarkdown(task))).join('\n')
-}
-
 const WorkSpace = ({ workSpaceId }) => {
-  const isSSR = typeof window === 'undefined'
   if (isSSR) return null
   const classes = useStyles()
   const { workSpaceState } = useContext(workSpaceContext)
@@ -143,10 +151,6 @@ const WorkSpace = ({ workSpaceId }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const handleClick = event => setAnchorEl(event.currentTarget)
   const handleClose = () => setAnchorEl(null)
-  const onClickClipboard = data => {
-    clipboard.writeText(queryToMarkdown(data.queryString))
-    handleClose()
-  }
   const closeQueryForm = () => setQueryForm({...queryForm, open: false })
   const onClickEdit = query => {
     setQueryForm({ ...queryForm, open: true, query })
@@ -190,7 +194,6 @@ const WorkSpace = ({ workSpaceId }) => {
                       <MoreVertIcon />
                     </IconButton>
                     <Menu anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
-                      <MenuItem onClick={() => onClickClipboard(query)}>Copy All</MenuItem>
                       <MenuItem onClick={() => onClickEdit(query)}>Edit</MenuItem>
                       <MenuItem onClick={() => onClickRemove(query)}>Remove</MenuItem>
                     </Menu>
